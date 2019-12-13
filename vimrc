@@ -37,7 +37,7 @@ Plugin 'dracula/vim', { 'name': 'dracula' }
 " Airline Plugin for colored arrows
 Plugin 'bling/vim-airline'
 
-"Plugin 'sheerun/vim-polyglot'
+Plugin 'sheerun/vim-polyglot'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
