@@ -39,6 +39,7 @@ Plugin 'bling/vim-airline'
 
 Plugin 'sheerun/vim-polyglot'
 Plugin 'scrooloose/nerdtree'
+Plugin 'ervandew/supertab'
 
 
 " All of your Plugins must be added before the following line

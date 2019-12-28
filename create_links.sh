@@ -3,7 +3,7 @@
 
 home="~/"
 
-declare -a files=("bashrc" "bash_profile" "vim" "vimrc")
+declare -a files=("bashrc" "bash_profile" "vim" "vimrc" "eslintrc")
 
 for i in "${files[@]}"
 do
