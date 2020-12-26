@@ -1,0 +1,83 @@
+"*":
+  "atom-package-deps":
+    ignored: [
+      "linter"
+    ]
+  build: {}
+  "build-mbed":
+    verbosity: "verbose"
+  "city-lights-ui":
+    fontSize: 10
+    showTabsInTreeView: true
+  "copy-with-style":
+    preset1:
+      format: "RTF"
+      name: "Copy for Word"
+  core:
+    ignoredNames: [
+      ".git"
+      ".hg"
+      ".svn"
+      ".DS_Store"
+      "._*"
+      "Thumbs.db"
+      "desktop.ini"
+      ".pioenvs"
+      ".piolibdeps"
+      ".clang_complete"
+      ".gcc-flags.json"
+    ]
+    projectHome: "/Users/danielriege/Documents"
+    telemetryConsent: "limited"
+    themes: [
+      "dracula-ui"
+      "dracula-syntax"
+    ]
+    titleBar: "custom"
+    useTreeSitterParsers: false
+  "dash-ui":
+    themeColor: "Red"
+  editor: {}
+  "exception-reporting":
+    userId: "70057548-b557-db22-9337-9352e8c9d568"
+  "file-icons": {}
+  "ide-java":
+    server:
+      errors:
+        incompleteClasspath:
+          severity: "ignore"
+  kite:
+    showWelcomeNotificationOnStartup: false
+  "linter-eslint":
+    autofix:
+      fixOnSave: true
+      ignoreFixableRulesWhileTyping: true
+    disabling: {}
+    global: {}
+  "linter-js-standard":
+    checkForEslintConfig: false
+    showEslintRules: true
+  "linter-ui-default":
+    panelHeight: 300
+    useBusySignal: false
+  "mbed-integration":
+    checkMbedToolchain: false
+  "platformio-ide":
+    advanced:
+      useBuiltinPIOCore: true
+  "remote-editor":
+    config: "e8acceefc981612cde7ecd4d8ea74e5c7b4a033e983a2d7701b9b1ccea36a2c66fede0d35aa13c8c6e58ee8b158bfae594c59c367e7a9daad6616d8f27d0dfc278cac366488c23c90c786ef5693e019f20563307156875d91aa0a94e855df5c0dfbb6d67e3b281c11ab735e81e127f15f7ad7aae4abba053ea0fdaff4134acbf8b362e318dbb0fdf87d0d54b64c31d4c5e0d0e61222879e26f1d5478303bdaa1e4bd9639a3b51770f6ece8e9dd8a433d7ad3881199fd898ba0f13e5909ad387e30e5bacb1c6c269efbe75a7c2b2428b0c38f76da5b8996e07e72317860a2e04a0d08132e15c690094401586da17a195731c9ccebcdd5a71788d4c0c04b1fffb25857604298631ff0a5e10b4c63649714cf8f3d3f058a"
+    password: "a0be88bcd0856930c33985"
+    tree:
+      showHiddenFiles: true
+      showOnRightSide: false
+      toggleOnStartup: true
+  "seti-ui":
+    compactView: true
+    fileIcons: false
+    themeColor: "Red"
+  "tool-bar": {}
+  "tree-view":
+    hideIgnoredNames: true
+  welcome:
+    showOnStartup: false

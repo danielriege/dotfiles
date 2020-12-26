@@ -1,0 +1,69 @@
+{
+  "_from": "https://www.atom.io/api/packages/platformio-ide-debugger/versions/1.2.6/tarball",
+  "_id": "platformio-ide-debugger@1.2.6",
+  "_inBundle": false,
+  "_integrity": "sha512-nlzrOeS0MH5b7CAf67WWrLz2Yg2Fy5r5Ybwd0FAiebCKjatEQIgCkIQwW7d102TO+DiJQYk0VmZ+ZkNswwa1tg==",
+  "_location": "/platformio-ide-debugger",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "remote",
+    "raw": "https://www.atom.io/api/packages/platformio-ide-debugger/versions/1.2.6/tarball",
+    "rawSpec": "https://www.atom.io/api/packages/platformio-ide-debugger/versions/1.2.6/tarball",
+    "saveSpec": "https://www.atom.io/api/packages/platformio-ide-debugger/versions/1.2.6/tarball",
+    "fetchSpec": "https://www.atom.io/api/packages/platformio-ide-debugger/versions/1.2.6/tarball"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://www.atom.io/api/packages/platformio-ide-debugger/versions/1.2.6/tarball",
+  "_shasum": "7acab2715271ce269a17b7a89bff45252a6f7621",
+  "_spec": "https://www.atom.io/api/packages/platformio-ide-debugger/versions/1.2.6/tarball",
+  "_where": "/private/var/folders/1k/xwq5n7k94jd62zj45hcmb2y00000gn/T/apm-install-dir-120330-63408-wzepbp.0jaqm",
+  "bugs": {
+    "url": "https://github.com/platformio/platformio-atom-ide-debugger/issues"
+  },
+  "bundleDependencies": false,
+  "consumedServices": {
+    "status-bar": {
+      "versions": {
+        "^1.0.0": "consumeStatusBar"
+      }
+    }
+  },
+  "dependencies": {
+    "atom-space-pen-views": "~2.2.0",
+    "underscore": "^1.8.3"
+  },
+  "deprecated": false,
+  "description": "A debugging front-end for PlatformIO IDE",
+  "engines": {
+    "atom": ">=1.13.0 <2.0.0"
+  },
+  "homepage": "https://github.com/platformio/platformio-atom-ide-debugger#readme",
+  "keywords": [
+    "platformio",
+    "gdb",
+    "debug",
+    "debugger",
+    "c",
+    "c++",
+    "embedded"
+  ],
+  "license": "GPL-3.0+",
+  "main": "./lib/main",
+  "name": "platformio-ide-debugger",
+  "providedServices": {
+    "platformioIDEDebugger": {
+      "description": "Provides debugging support for PlatformIO IDE",
+      "versions": {
+        "1.0.0": "provideDebugger"
+      }
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/platformio/platformio-atom-ide-debugger.git"
+  },
+  "version": "1.2.6"
+}

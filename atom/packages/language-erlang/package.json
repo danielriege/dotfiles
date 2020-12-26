@@ -1,0 +1,40 @@
+{
+  "_from": "https://www.atom.io/api/packages/language-erlang/versions/3.2.0/tarball",
+  "_id": "language-erlang@3.2.0",
+  "_inBundle": false,
+  "_integrity": "sha512-srj55UTuziI4v23WTM/lQbzJk966+JObVD68ch5BWOXB9EkwZCb+eRVobukCCm01MnxjslSt+9nhhDjV4XYEUA==",
+  "_location": "/language-erlang",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "remote",
+    "raw": "https://www.atom.io/api/packages/language-erlang/versions/3.2.0/tarball",
+    "rawSpec": "https://www.atom.io/api/packages/language-erlang/versions/3.2.0/tarball",
+    "saveSpec": "https://www.atom.io/api/packages/language-erlang/versions/3.2.0/tarball",
+    "fetchSpec": "https://www.atom.io/api/packages/language-erlang/versions/3.2.0/tarball"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://www.atom.io/api/packages/language-erlang/versions/3.2.0/tarball",
+  "_shasum": "458b3457a32256d38be913bf98f3041671b0e669",
+  "_spec": "https://www.atom.io/api/packages/language-erlang/versions/3.2.0/tarball",
+  "_where": "/private/var/folders/1k/xwq5n7k94jd62zj45hcmb2y00000gn/T/apm-install-dir-11996-15077-v8txgw.g1sm",
+  "bugs": {
+    "url": "https://github.com/jonathanmarvens/atom-language-erlang/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "Erlang language support for Atom.",
+  "engines": {
+    "atom": ">=0.185.0 <2.0.0"
+  },
+  "homepage": "https://github.com/jonathanmarvens/atom-language-erlang#readme",
+  "license": "MIT",
+  "name": "language-erlang",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonathanmarvens/atom-language-erlang.git"
+  },
+  "version": "3.2.0"
+}
