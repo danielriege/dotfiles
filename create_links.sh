@@ -3,11 +3,11 @@
 
 home="~/"
 
-declare -a files=("vim" "vimrc" "atom")
+declare -a files=("vim" "vimrc" "tmux.conf")
 
 for i in "${files[@]}"
 do
-	ln -s ./$i 	~/.$i 
+	ln -s $PWD/$i 	~/.$i 
 
 done
 

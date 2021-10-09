@@ -1,8 +1,0 @@
-{
-  "atom-workspace": {
-    "shift-alt-m": "sermon:toggle"
-  },
-  ".sermon": {
-    "escape": "sermon:toggle"
-  }
-}

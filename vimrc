@@ -150,5 +150,6 @@ let g:dracula_italic = 0
 "let g:solarized_termtrans=1
 " put https://raw.github.com/altercation/vim-colors-solarized/master/colors/solarized.vim
 " in ~/.vim/colors/ and uncomment:
-colorscheme dracula
+"colorscheme dracula
+colorscheme cyberpunk-neon
 highlight Normal ctermbg=None
