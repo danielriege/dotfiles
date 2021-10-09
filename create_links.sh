@@ -3,7 +3,7 @@
 
 home="~/"
 
-declare -a files=("vim" "vimrc" "tmux.conf")
+declare -a files=("vimrc" "tmux.conf")
 
 for i in "${files[@]}"
 do
