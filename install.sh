@@ -9,7 +9,7 @@ else
 fi
 
 # linking conf files
-declare -a files=("vimrc" "tmux.conf")
+declare -a files=("vimrc" "tmux.conf" "p10k.zsh")
 for i in "${files[@]}"
 do
 	# first remove these files from home directory if they exist
