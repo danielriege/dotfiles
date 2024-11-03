@@ -8,27 +8,16 @@ else
 	echo "oh-my-zsh already installed"
 fi
 
-# linking conf files
-declare -a files=("vimrc" "tmux.conf" "p10k.zsh")
-for i in "${files[@]}"
-do
-	# first remove these files from home directory if they exist
-	if [ -f ~/.$i ]; then
-		echo "Removing $i from home directory"
-		rm ~/.$i
-	fi
-	# then link them
-	echo "Linking $i"
-	ln -s $PWD/$i 	~/.$i 
-done
+cp -r config/nvim ~/.config/ 
+cp -r config/tmux ~/.config/ 
 
 # install tpm
-if [ ! -d ~/.tmux/plugins/tpm ]; then
-  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+if [ ! -d ~/.config/tmux/plugins/tpm ]; then
+  git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
 fi
 # installing tmux plugins
 echo "Installing tmux plugins"
-~/.tmux/plugins/tpm/scripts/install_plugins.sh
+~/.config/tmux/plugins/tpm/scripts/install_plugins.sh
 
 # installing dracula theme for oh-my-zsh
 if [ ! -d ~/.oh-my-zsh/custom/themes/powerlevel10k ]; then
@@ -40,4 +29,4 @@ sed -i 's|ZSH_THEME=".*"|ZSH_THEME="powerlevel10k/powerlevel10k"|' ~/.zshrc
 # .zshrc configs
 # remove git plugin
 sed -i 's/plugins=(git)/plugins=()/' ~/.zshrc
-git config oh-my-zsh.hide-info 1 --global
+
