@@ -33,3 +33,22 @@ vim.opt.mouse = ""
 --vim.opt.colorcolumn = "80"
 
 vim.cmd.colorscheme("tokyonight")
+
+vim.lsp.set_log_level('debug')
+
+-- vim.wo.foldmethod = 'expr'
+-- vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
+
+vim.diagnostic.config({
+	virtual_text = true,
+	signs = true,
+	update_in_insert = true,
+	underline = true,
+	severity_sort = false,
+	float = {
+		border = 'rounded',
+		source = 'always',
+		header = '',
+		prefix = '',
+	},
+})

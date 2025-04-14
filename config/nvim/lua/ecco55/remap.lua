@@ -24,7 +24,12 @@ vim.api.nvim_create_autocmd('LspAttach', {
       { "<leader>la", function() vim.lsp.buf.code_action() end,      desc = "Code action",               mode = "n" },
       { "<leader>ln", function() vim.lsp.buf.rename() end,           desc = "Rename",                    mode = "n" },
       { "<leader>lw", function() vim.lsp.buf.workspace_symbol() end, desc = "Workspace symbol",          mode = "n" },
-      { "<leader>lr", ":LspRestart<CR>",                             desc = "Restart LSP",               mode = "n" }
+      { "<leader>lr", ":LspRestart<CR>",                             desc = "Restart LSP",               mode = "n" },
+
+      -- ollama
+      { "<leader>]", group = "Ollama"},
+      { "<leader>]c", ":Gen Chat<CR>", desc = "Chat", mode = "nv" },
+      { "<leader>]a", ":Gen Ask<CR>", desc = "Ask", mode = "nv"},
     }
 
     which_key.add(mappings, opts)
@@ -41,13 +46,13 @@ vim.api.nvim_create_autocmd('LspAttach', {
     -- vim.keymap.set('i', '<C-h>', function() vim.lsp.buf.signature_help() end, opts)
 
     -- https://www.mitchellhanberg.com/modern-format-on-save-in-neovim/
-    vim.api.nvim_create_autocmd("BufWritePre", {
-      buffer = event.buf,
-      callback = function()
-        vim.lsp.buf.format { async = false, id = event.data.client_id }
-      end
+    -- vim.api.nvim_create_autocmd("BufWritePre", {
+    -- buffer = event.buf,
+    -- callback = function()
+    -- vim.lsp.buf.format { async = false, id = event.data.client_id }
+    -- end
 
-    })
+    -- })
   end,
 })
 
@@ -107,10 +112,10 @@ end
 local harpoon_mappings = {
   { "<leader>a", function() harpoon:list():add() end,             desc = "Add to Harpoon",    mode = "n" },
   { "<leader>h", function() toggle_telescope(harpoon:list()) end, desc = "Show Harpoon Menu", mode = "n" },
-  { "<C-h>",     function() harpoon:list():select(1) end,         desc = "Open 1",            mode = "n" },
-  { "<C-t>",     function() harpoon:list():select(2) end,         desc = "Open 2",            mode = "n" },
-  { "<C-n>",     function() harpoon:list():select(3) end,         desc = "Open 3",            mode = "n" },
-  { "<C-s>",     function() harpoon:list():select(4) end,         desc = "Open 4",            mode = "n" },
+  { "<C-1>",     function() harpoon:list():select(1) end,         desc = "Open 1",            mode = "n" },
+  { "<C-2>",     function() harpoon:list():select(2) end,         desc = "Open 2",            mode = "n" },
+  { "<C-3>",     function() harpoon:list():select(3) end,         desc = "Open 3",            mode = "n" },
+  { "<C-4>",     function() harpoon:list():select(4) end,         desc = "Open 4",            mode = "n" },
   { "<C-S-P>",   function() harpoon:list():next() end,            desc = "Next",              mode = "n" },
   { "<C-S-N>",   function() harpoon:list():prev() end,            desc = "Prev",              mode = "n" },
 }
