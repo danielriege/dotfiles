@@ -32,7 +32,8 @@ vim.opt.mouse = ""
 
 --vim.opt.colorcolumn = "80"
 
-vim.cmd.colorscheme("tokyonight")
+-- vim.cmd.colorscheme("tokyonight")
+vim.cmd.colorscheme("dracula")
 
 vim.lsp.set_log_level('debug')
 

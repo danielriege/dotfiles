@@ -1,0 +1,100 @@
+/tmp/.mount_Logic-aX2T5R ~/.config/nvim/lua/ecco55
+~/.config/nvim/lua/ecco55
+Environment
+  Executable path: /tmp/.mount_Logic-aX2T5R/Logic
+  Executable directory: /tmp/.mount_Logic-aX2T5R
+  Original working directory: /home/riegedan/.config/nvim/lua/ecco55
+  Current working directory: /tmp/.mount_Logic-aX2T5R
+  Process ID: 524739
+Crash reporting enabled. Machine ID: 3daaaae7-a643-4fd1-bbc8-48dedf6545d1
+[524739:0304/164456.913695:ERROR:nss_util.cc(357)] After loading Root Certs, loaded==false: NSS error code: -8018
+[2025-03-04 16:44:57.033431] [C] [tid 524972] [main] [saleae_log.cpp:296] Global logging level is set to: debug
+[2025-03-04 16:44:57.033444] [I] [tid 524972] [main] [saleae_log.cpp:298] Logfile path set to: /home/riegedan/.config/Logic/logs/graphio-2025-03-04--16-44-55.log
+[0304/164457.314156:ERROR:elf_dynamic_array_reader.h(64)] tag not found
+[0304/164457.314449:ERROR:elf_dynamic_array_reader.h(64)] tag not found
+[0304/164457.314588:ERROR:elf_dynamic_array_reader.h(64)] tag not found
+[0304/164457.317418:ERROR:directory_reader_posix.cc(42)] opendir /home/riegedan/.config/Logic/Crashpad/attachments/80eda381-4cd6-4aa3-8243-344c6dae8e79: No such file or directory (2)
+[2025-03-04 16:44:57.684648] [I] [tid 525066] [main] [graph_server.cpp:824] DeleteGraphData SeesionId: -2
+[2025-03-04 16:44:57.684662] [I] [tid 525066] [main] [graph_server.cpp:848] DeleteGraph( -2 ) called
+[2025-03-04 16:44:57.820077] [I] [tid 525066] [usb] [DevicesManager.cpp:167] Resetting DevicesManager
+[2025-03-04 16:44:57.820202] [D] [tid 525074] [usb] [DevicesManager.cpp:533] CheckForConnectionThread thread ID: 140688110859968
+[2025-03-04 16:44:57.832589] [I] [tid 525074] [usb] [base_usb_manager.cpp:25] Env is set to NullOpt
+[2025-03-04 16:44:57.832631] [E] [tid 525074] [usb] [LinuxUsbDevice.cpp:108] libusb_open failed: code=-3, name=LIBUSB_ERROR_ACCESS, desc=Access denied (insufficient permissions)
+[2025-03-04 16:44:57.839806] [E] [tid 525074] [usb] [DevicesManager.cpp:481] Error during device connection: USB Permissions
+[2025-03-04 16:44:57.839993] [E] [tid 525074] [device] [DevicesManager.cpp:562] device error or disconnection during device-specific construction: USB Permissions
+[524889:0304/164457.848927:ERROR:gl_surface_presentation_helper.cc(260)] GetVSyncParametersIfAvailable() failed for 1 times!
+[524889:0304/164457.852128:ERROR:gl_surface_presentation_helper.cc(260)] GetVSyncParametersIfAvailable() failed for 2 times!
+[524889:0304/164457.862374:ERROR:gl_surface_presentation_helper.cc(260)] GetVSyncParametersIfAvailable() failed for 3 times!
+error submitting otlp telemetry request: FetchError: request to https://o11y.saleae.com/v1/logs failed, reason: getaddrinfo ENOTFOUND o11y.saleae.com
+    at ClientRequest.<anonymous> (/tmp/.mount_Logic-aX2T5R/resources/app.asar/node_modules/node-fetch/lib/index.js:1491:11)
+    at ClientRequest.emit (node:events:514:28)
+    at TLSSocket.socketErrorListener (node:_http_client:501:9)
+    at TLSSocket.emit (node:events:514:28)
+    at emitErrorNT (node:internal/streams/destroy:151:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:116:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  type: 'system',
+  errno: 'ENOTFOUND',
+  code: 'ENOTFOUND'
+}
+error submitting otlp telemetry request: FetchError: request to https://o11y.saleae.com/v1/logs failed, reason: getaddrinfo ENOTFOUND o11y.saleae.com
+    at ClientRequest.<anonymous> (/tmp/.mount_Logic-aX2T5R/resources/app.asar/node_modules/node-fetch/lib/index.js:1491:11)
+    at ClientRequest.emit (node:events:514:28)
+    at TLSSocket.socketErrorListener (node:_http_client:501:9)
+    at TLSSocket.emit (node:events:514:28)
+    at emitErrorNT (node:internal/streams/destroy:151:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:116:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  type: 'system',
+  errno: 'ENOTFOUND',
+  code: 'ENOTFOUND'
+}
+error submitting otlp telemetry request: FetchError: request to https://o11y.saleae.com/v1/logs failed, reason: getaddrinfo ENOTFOUND o11y.saleae.com
+    at ClientRequest.<anonymous> (/tmp/.mount_Logic-aX2T5R/resources/app.asar/node_modules/node-fetch/lib/index.js:1491:11)
+    at ClientRequest.emit (node:events:514:28)
+    at TLSSocket.socketErrorListener (node:_http_client:501:9)
+    at TLSSocket.emit (node:events:514:28)
+    at emitErrorNT (node:internal/streams/destroy:151:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:116:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  type: 'system',
+  errno: 'ENOTFOUND',
+  code: 'ENOTFOUND'
+}
+error submitting otlp telemetry request: FetchError: request to https://o11y.saleae.com/v1/logs failed, reason: getaddrinfo ENOTFOUND o11y.saleae.com
+    at ClientRequest.<anonymous> (/tmp/.mount_Logic-aX2T5R/resources/app.asar/node_modules/node-fetch/lib/index.js:1491:11)
+    at ClientRequest.emit (node:events:514:28)
+    at TLSSocket.socketErrorListener (node:_http_client:501:9)
+    at TLSSocket.emit (node:events:514:28)
+    at emitErrorNT (node:internal/streams/destroy:151:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:116:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  type: 'system',
+  errno: 'ENOTFOUND',
+  code: 'ENOTFOUND'
+}
+@saleae/electron/main: windows closed {}
+error submitting otlp telemetry request: FetchError: request to https://o11y.saleae.com/v1/logs failed, reason: getaddrinfo ENOTFOUND o11y.saleae.com
+    at ClientRequest.<anonymous> (/tmp/.mount_Logic-aX2T5R/resources/app.asar/node_modules/node-fetch/lib/index.js:1491:11)
+    at ClientRequest.emit (node:events:514:28)
+    at TLSSocket.socketErrorListener (node:_http_client:501:9)
+    at TLSSocket.emit (node:events:514:28)
+    at emitErrorNT (node:internal/streams/destroy:151:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:116:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  type: 'system',
+  errno: 'ENOTFOUND',
+  code: 'ENOTFOUND'
+}
+error submitting otlp telemetry request: FetchError: request to https://o11y.saleae.com/v1/logs failed, reason: getaddrinfo ENOTFOUND o11y.saleae.com
+    at ClientRequest.<anonymous> (/tmp/.mount_Logic-aX2T5R/resources/app.asar/node_modules/node-fetch/lib/index.js:1491:11)
+    at ClientRequest.emit (node:events:514:28)
+    at TLSSocket.socketErrorListener (node:_http_client:501:9)
+    at TLSSocket.emit (node:events:514:28)
+    at emitErrorNT (node:internal/streams/destroy:151:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:116:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  type: 'system',
+  errno: 'ENOTFOUND',
+  code: 'ENOTFOUND'
+}
