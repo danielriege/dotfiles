@@ -1,32 +1,103 @@
-#!/usr/bin/env zsh
+#!/usr/bin/env bash
 
-# install oh-my-zsh if not installed
-if [ ! -d ~/.oh-my-zsh ]; then
-	echo "Installing oh-my-zsh"
-	sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+set -euo pipefail
+
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# ── Detect OS ─────────────────────────────────────────────────────────────────
+OS="$(uname -s)"
+case "$OS" in
+  Darwin*) OS=mac ;;
+  Linux*)  OS=linux ;;
+  *) echo "Unsupported OS: $OS" && exit 1 ;;
+esac
+
+# ── Helpers ───────────────────────────────────────────────────────────────────
+info()    { echo "  [..] $*"; }
+ok()      { echo "  [ok] $*"; }
+warn()    { echo "  [!!] $*"; }
+
+# Create symlink src→dst, backing up any existing file/dir first.
+make_link() {
+  local src="$1"
+  local dst="$2"
+
+  # Already the correct symlink — nothing to do
+  if [ -L "$dst" ] && [ "$(readlink "$dst")" = "$src" ]; then
+    ok "symlink already correct: $dst"
+    return
+  fi
+
+  # Back up whatever's there so we don't silently destroy work
+  if [ -e "$dst" ] || [ -L "$dst" ]; then
+    local backup="${dst}.bak.$(date +%s)"
+    warn "backing up $dst → $backup"
+    mv "$dst" "$backup"
+  fi
+
+  mkdir -p "$(dirname "$dst")"
+  ln -s "$src" "$dst"
+  ok "linked $dst → $src"
+}
+
+# Portable in-place sed (macOS needs the empty-string extension arg)
+sed_inplace() {
+  if [ "$OS" = "mac" ]; then
+    sed -i '' "$@"
+  else
+    sed -i "$@"
+  fi
+}
+
+# ── oh-my-zsh ─────────────────────────────────────────────────────────────────
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  info "installing oh-my-zsh"
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 else
-	echo "oh-my-zsh already installed"
+  ok "oh-my-zsh already installed"
 fi
 
-cp -r config/nvim ~/.config/ 
-cp -r config/tmux ~/.config/ 
+# ── Symlink configs ───────────────────────────────────────────────────────────
+mkdir -p "$HOME/.config"
+make_link "$DOTFILES_DIR/config/nvim" "$HOME/.config/nvim"
+make_link "$DOTFILES_DIR/config/tmux" "$HOME/.config/tmux"
 
-# install tpm
-if [ ! -d ~/.config/tmux/plugins/tpm ]; then
-  git clone https://github.com/tmux-plugins/tpm ~/.config/tmux/plugins/tpm
+# ── TPM ───────────────────────────────────────────────────────────────────────
+# tpm lives inside config/tmux/plugins/tpm which is now symlinked, so it's
+# already available. Only clone if somehow missing (e.g. fresh checkout without
+# the nested repo populated).
+if [ ! -d "$HOME/.config/tmux/plugins/tpm" ]; then
+  info "installing tpm"
+  git clone https://github.com/tmux-plugins/tpm "$HOME/.config/tmux/plugins/tpm"
+else
+  ok "tpm already present"
 fi
-# installing tmux plugins
-echo "Installing tmux plugins"
-~/.config/tmux/plugins/tpm/scripts/install_plugins.sh
 
-# installing dracula theme for oh-my-zsh
-if [ ! -d ~/.oh-my-zsh/custom/themes/powerlevel10k ]; then
-	echo "Installing powerlevel10k theme for oh-my-zsh"
-	git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/.oh-my-zsh/custom/themes/powerlevel10k
+# Install tmux plugins headlessly
+if [ -x "$HOME/.config/tmux/plugins/tpm/scripts/install_plugins.sh" ]; then
+  info "installing tmux plugins"
+  TMUX_PLUGIN_MANAGER_PATH="$HOME/.config/tmux/plugins" \
+    "$HOME/.config/tmux/plugins/tpm/scripts/install_plugins.sh"
 fi
-sed -i 's|ZSH_THEME=".*"|ZSH_THEME="powerlevel10k/powerlevel10k"|' ~/.zshrc
 
-# .zshrc configs
-# remove git plugin
-sed -i 's/plugins=(git)/plugins=()/' ~/.zshrc
+# ── powerlevel10k ─────────────────────────────────────────────────────────────
+P10K_DIR="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
+if [ ! -d "$P10K_DIR" ]; then
+  info "installing powerlevel10k"
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$P10K_DIR"
+else
+  ok "powerlevel10k already installed"
+fi
 
+# ── Patch .zshrc ──────────────────────────────────────────────────────────────
+ZSHRC="$HOME/.zshrc"
+if [ -f "$ZSHRC" ]; then
+  sed_inplace 's|ZSH_THEME=".*"|ZSH_THEME="powerlevel10k/powerlevel10k"|' "$ZSHRC"
+  sed_inplace 's/plugins=(git)/plugins=()/' "$ZSHRC"
+  ok "patched .zshrc"
+else
+  warn ".zshrc not found — skipping zsh patches"
+fi
+
+echo ""
+ok "done. restart your terminal or: source ~/.zshrc"
