@@ -34,6 +34,37 @@ vim.opt.mouse = ""
 
 -- vim.cmd.colorscheme("tokyonight")
 vim.cmd.colorscheme("dracula")
+local groups = {
+  "Normal",
+  "NormalNC",
+  "NormalFloat",
+  "FloatBorder",
+  "SignColumn",
+  "EndOfBuffer",
+
+  -- NvimTree
+  "NvimTreeNormal",
+  "NvimTreeNormalNC",
+  "NvimTreeEndOfBuffer",
+  "NvimTreeVertSplit",
+
+  -- Telescope
+  "TelescopeNormal",
+  "TelescopeBorder",
+
+  -- WhichKey
+  "WhichKeyFloat",
+
+  -- LSP
+  "DiagnosticSignError",
+  "DiagnosticSignWarn",
+  "DiagnosticSignInfo",
+  "DiagnosticSignHint",
+}
+
+for _, group in ipairs(groups) do
+  vim.api.nvim_set_hl(0, group, { bg = "none" })
+end
 
 vim.lsp.set_log_level('debug')
 

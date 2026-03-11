@@ -46,6 +46,91 @@ local non_lsp_mappings = {
   -- Uncomment this if needed
   -- { "<leader>t", "<cmd>Today<cr>", desc = "Open today's note", mode = "n" },
 
+  -- Git mappings (always available)
+  { "<leader>gg", function()
+      vim.cmd("vert Git")
+      -- Auto-close the Git status window when opening a file from it
+      local git_buf = vim.api.nvim_get_current_buf()
+      vim.api.nvim_create_autocmd("BufLeave", {
+        buffer = git_buf,
+        callback = function()
+          -- Delay slightly to check what buffer we entered
+          vim.defer_fn(function()
+            local new_buf = vim.api.nvim_get_current_buf()
+            local buftype = vim.api.nvim_get_option_value('buftype', { buf = new_buf })
+            -- Only close if we're entering a normal file buffer (empty buftype)
+            -- This excludes command line, quickfix, terminal, etc.
+            if buftype == '' and new_buf ~= git_buf then
+              -- Find and close the window containing the git status buffer
+              for _, win in ipairs(vim.api.nvim_list_wins()) do
+                if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == git_buf then
+                  vim.api.nvim_win_close(win, false)
+                  -- Remove this autocmd after closing
+                  vim.api.nvim_clear_autocmds({ buffer = git_buf, event = "BufLeave" })
+                  break
+                end
+              end
+            end
+          end, 50)
+        end,
+      })
+    end, desc = "Git status", mode = "n" },
+  { "<leader>gm", function()
+      vim.cmd("Gvdiffsplit!")
+      -- After opening the 3-way diff, set titles for each window using winbar
+      vim.defer_fn(function()
+        local wins = vim.api.nvim_tabpage_list_wins(0)
+        -- Get windows from left to right based on their column position
+        local win_positions = {}
+        for _, win in ipairs(wins) do
+          if vim.wo[win].diff then
+            local buf = vim.api.nvim_win_get_buf(win)
+            local bufname = vim.api.nvim_buf_get_name(buf)
+            local pos = vim.api.nvim_win_get_position(win)
+            table.insert(win_positions, { win = win, col = pos[2], name = bufname })
+          end
+        end
+
+        -- Sort windows by column position (left to right)
+        table.sort(win_positions, function(a, b) return a.col < b.col end)
+
+        -- Check buffer names to identify which is which
+        -- fugitive:// buffers: :2: = OURS (HEAD), :3: = THEIRS (MERGE_HEAD)
+        -- working file has no fugitive:// prefix and contains conflict markers
+        if #win_positions == 3 then
+          for i, wp in ipairs(win_positions) do
+            local label = ""
+            if wp.name:match("fugitive://") then
+              -- :2: is stage 2 = OURS (HEAD/current branch)
+              if wp.name:match(":2:") or wp.name:match("//2/") then
+                label = "%#DiffDelete#  OURS (HEAD/current branch) - use ghl  %*"
+              -- :3: is stage 3 = THEIRS (MERGE_HEAD/incoming branch)
+              elseif wp.name:match(":3:") or wp.name:match("//3/") then
+                label = "%#DiffAdd#  THEIRS (incoming branch) - use ghr  %*"
+              else
+                label = "%#WarningMsg# Unknown fugitive buffer " .. i .. " %*"
+              end
+            else
+              -- This is the working copy with conflict markers - this is what you edit
+              label = "%#DiffChange#  WORKING COPY (has conflict markers) - EDIT HERE  %*"
+            end
+
+            vim.api.nvim_win_call(wp.win, function()
+              vim.wo.winbar = label
+            end)
+          end
+        end
+      end, 100)
+    end, desc = "Open 3-way merge conflict view", mode = "n" },
+
+  -- Jump to conflict markers
+  { "]x", function()
+      vim.fn.search("^\\(<<<<<<<\\|=======\\|>>>>>>>\\)", "W")
+    end, desc = "Next conflict marker", mode = "n" },
+  { "[x", function()
+      vim.fn.search("^\\(<<<<<<<\\|=======\\|>>>>>>>\\)", "bW")
+    end, desc = "Previous conflict marker", mode = "n" },
+
   -- Non-leader Mappings
   { "J",          "mzJ`z",                                                desc = "Join lines and keep cursor position",  mode = "n" },
   { "<C-d>",      "<C-d>zz",                                              desc = "Half page down and center",            mode = "n" },
@@ -117,6 +202,48 @@ local telescope_mappings = {
   { "<leader>fg", "<cmd>Telescope git_status<CR>",      desc = "Telescope Git status", mode = "n" },
   { "<leader>fb", "<cmd>Telescope git_branches<CR>",    desc = "Telescope Git branches", mode = "n" },
   { "<leader>fc", "<cmd>Telescope git_commits<CR>",     desc = "Telescope Git commits", mode = "n" },
+  { "<leader>fd",
+    function()
+      -- Prompt for branch to compare against
+      local branch = vim.fn.input("Show files changed vs branch: ")
+      if branch ~= "" then
+        -- Auto-prepend origin/ if not already specified
+        if not branch:match("^origin/") and not branch:match("^refs/") then
+          branch = "origin/" .. branch
+        end
+
+        -- Get the list of changed files between target branch and current branch
+        -- branch...HEAD shows what changed on current branch since diverging from branch
+        local handle = io.popen("git diff --name-only " .. vim.fn.shellescape(branch) .. "...HEAD")
+        if handle then
+          local result = handle:read("*a")
+          handle:close()
+
+          -- Split result into table of file paths
+          local files = {}
+          for file in result:gmatch("[^\r\n]+") do
+            table.insert(files, file)
+          end
+
+          if #files > 0 then
+            -- Create telescope picker with the changed files
+            require("telescope.pickers").new({}, {
+              prompt_title = "Files Changed vs " .. branch,
+              finder = require("telescope.finders").new_table({
+                results = files,
+              }),
+              previewer = conf.file_previewer({}),
+              sorter = conf.generic_sorter({}),
+            }):find()
+          else
+            print("No files changed between current branch and " .. branch)
+          end
+        end
+      end
+    end,
+    desc = "Files changed vs branch",
+    mode = "n"
+  },
 
 }
 
@@ -140,8 +267,19 @@ require("gitsigns").setup({
 
     local git_mappings = {
       -- Fugitive Git workflow
-      { "<leader>gg", function() vim.cmd("vert Git") end, desc = "Git status", mode = "n" },
-      { "<leader>gd", function() vim.cmd("Gvdiffsplit") end, desc = "Diff split", mode = "n" },
+      { "<leader>gd",
+        function()
+          -- Prompt user for branch name to compare against
+          local branch = vim.fn.input("Diff current file with branch: ")
+          if branch ~= "" then
+            -- Use Gvdiffsplit! for 3-way diff (includes merge base)
+            -- This shows: [target branch] [merge base] [current branch]
+            vim.cmd("Gvdiffsplit! " .. vim.fn.fnameescape(branch))
+          end
+        end,
+        desc = "3-way diff with branch",
+        mode = "n"
+      },
       { "<leader>gb", function() vim.cmd("Git blame") end, desc = "Blame current line", mode = "n" },
       { "<leader>grd",
         function()
@@ -159,6 +297,7 @@ require("gitsigns").setup({
       { "<leader>gl", function() vim.cmd("vert Git log") end, desc = "Git Log", mode = "n" },
       { "<leader>ga", function() vim.cmd("Gwrite") end, desc = "Stage/Add current file", mode = "n" },
       { "<leader>gc", function() vim.cmd("Git commit") end, desc = "Git commit", mode = "n" },
+      { "<leader>gP", function() vim.cmd("Git push") end, desc = "Git push", mode = "n" },
 
       -- Gitsigns Hunk actions
       { "<leader>gs", function() gs.stage_hunk() end,      desc = "Stage hunk", mode = "n" },
