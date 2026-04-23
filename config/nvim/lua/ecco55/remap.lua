@@ -49,31 +49,6 @@ local non_lsp_mappings = {
   -- Git mappings (always available)
   { "<leader>gg", function()
       vim.cmd("vert Git")
-      -- Auto-close the Git status window when opening a file from it
-      local git_buf = vim.api.nvim_get_current_buf()
-      vim.api.nvim_create_autocmd("BufLeave", {
-        buffer = git_buf,
-        callback = function()
-          -- Delay slightly to check what buffer we entered
-          vim.defer_fn(function()
-            local new_buf = vim.api.nvim_get_current_buf()
-            local buftype = vim.api.nvim_get_option_value('buftype', { buf = new_buf })
-            -- Only close if we're entering a normal file buffer (empty buftype)
-            -- This excludes command line, quickfix, terminal, etc.
-            if buftype == '' and new_buf ~= git_buf then
-              -- Find and close the window containing the git status buffer
-              for _, win in ipairs(vim.api.nvim_list_wins()) do
-                if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == git_buf then
-                  vim.api.nvim_win_close(win, false)
-                  -- Remove this autocmd after closing
-                  vim.api.nvim_clear_autocmds({ buffer = git_buf, event = "BufLeave" })
-                  break
-                end
-              end
-            end
-          end, 50)
-        end,
-      })
     end, desc = "Git status", mode = "n" },
   { "<leader>gm", function()
       vim.cmd("Gvdiffsplit!")
@@ -195,7 +170,7 @@ which_key.add(git_diff_tool)
 -- Telescope Commands
 
 local telescope_mappings = {
-  { "<leader>ff", function() builtin.find_files() end,                                      desc = "Find files",     mode = "n" },
+  { "<leader>ff", function() builtin.find_files({ hidden = true }) end,                     desc = "Find files",     mode = "n" },
   { "<leader>fl", function() builtin.live_grep() end,                                       desc = "Live grep",      mode = "n" },
   { "<leader>fs", function() builtin.grep_string({ search = vim.fn.input("Grep > ") }) end, desc = "Grep string",    mode = "n" },
   -- Telescope Git Pickers
