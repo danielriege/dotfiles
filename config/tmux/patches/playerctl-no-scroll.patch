@@ -1,0 +1,38 @@
+--- a/scripts/playerctl.sh
++++ b/scripts/playerctl.sh
+@@ -34,34 +34,15 @@
+   playerctl_playback=$(playerctl metadata --format "${FORMAT}")
+   playerctl_playback="${playerctl_playback} "
+
+-  # Adjust width of string
+-  terminal_width=25
+-
+-  # Initial start point for scrolling
+-  start=0
+   len=${#playerctl_playback}
+
+-  # previously we have appended a space to playerctl_playback
+   # if there is no player, len sees only one space
+   # exit the script and output nothing if there is just that space
+   if [[ $len == 1 ]]; then
+     exit
+   fi
+
+-  scrolling_text=""
+-
+-  for ((start = 0; start <= len; start++)); do
+-    scrolling_text=$(slice_loop "$playerctl_playback" "$start" "$terminal_width")
+-    echo -ne "\r"
+-    echo "$scrolling_text "
+-    echo -ne "\r"
+-
+-    sleep 0.08
+-  done
+-
+-  echo -ne "\r"
+-  echo "$scrolling_text "
+-  echo -ne "\r"
++  echo "${playerctl_playback% }"
+ }
+
+ # run the main driver
