@@ -80,6 +80,16 @@ if [ -x "$HOME/.config/tmux/plugins/tpm/scripts/install_plugins.sh" ]; then
     "$HOME/.config/tmux/plugins/tpm/scripts/install_plugins.sh"
 fi
 
+# ── Apply tmux plugin patches ─────────────────────────────────────────────
+PLAYERCTL_SCRIPT="$HOME/.config/tmux/plugins/tmux/scripts/playerctl.sh"
+PLAYERCTL_PATCH="$DOTFILES_DIR/config/tmux/patches/playerctl-no-scroll.patch"
+if [ -f "$PLAYERCTL_SCRIPT" ] && [ -f "$PLAYERCTL_PATCH" ]; then
+  info "patching playerctl plugin (disable scrolling)"
+  patch -N -p1 "$PLAYERCTL_SCRIPT" < "$PLAYERCTL_PATCH" \
+    && ok "playerctl patched" \
+    || warn "playerctl patch skipped (already applied or conflict)"
+fi
+
 # ── powerlevel10k ─────────────────────────────────────────────────────────────
 P10K_DIR="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
 if [ ! -d "$P10K_DIR" ]; then
