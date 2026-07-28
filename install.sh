@@ -61,6 +61,13 @@ fi
 mkdir -p "$HOME/.config"
 make_link "$DOTFILES_DIR/config/nvim" "$HOME/.config/nvim"
 make_link "$DOTFILES_DIR/config/tmux" "$HOME/.config/tmux"
+make_link "$DOTFILES_DIR/config/lazygit" "$HOME/.config/lazygit"
+
+# On macOS lazygit does NOT read ~/.config unless XDG_CONFIG_HOME is set — it
+# looks in ~/Library/Application Support/lazygit. Link both so either works.
+if [ "$OS" = "mac" ]; then
+  make_link "$DOTFILES_DIR/config/lazygit" "$HOME/Library/Application Support/lazygit"
+fi
 
 # ── TPM ───────────────────────────────────────────────────────────────────────
 # tpm lives inside config/tmux/plugins/tpm which is now symlinked, so it's
@@ -90,6 +97,59 @@ if [ -f "$PLAYERCTL_SCRIPT" ] && [ -f "$PLAYERCTL_PATCH" ]; then
     || warn "playerctl patch skipped (already applied or conflict)"
 fi
 
+# ── lazygit ───────────────────────────────────────────────────────────────────
+# Pinned version, installed into ~/.local/bin (no sudo needed — Ubuntu only
+# ships lazygit in apt from 24.10 onward, and a system-wide install would make
+# this script prompt for a password halfway through).
+#
+# To upgrade: bump LAZYGIT_VERSION and re-run. config/lazygit/config.yml sets
+# `update: method: never` so lazygit can't self-update behind the dotfiles' back
+# and leave the binary out of sync with what's pinned here.
+LAZYGIT_VERSION="0.63.1"
+LAZYGIT_BIN="$HOME/.local/bin/lazygit"
+
+if [ -x "$LAZYGIT_BIN" ] && "$LAZYGIT_BIN" --version 2>/dev/null | grep -q "version=$LAZYGIT_VERSION"; then
+  ok "lazygit $LAZYGIT_VERSION already installed"
+else
+  # Assets are named lazygit_<ver>_<Linux|Darwin>_<x86_64|arm64>.tar.gz
+  case "$OS" in
+    mac)   LG_OS="Darwin" ;;
+    linux) LG_OS="Linux"  ;;
+  esac
+  case "$(uname -m)" in
+    x86_64 | amd64)  LG_ARCH="x86_64" ;;
+    arm64 | aarch64) LG_ARCH="arm64"  ;;
+    *)               LG_ARCH=""       ;;
+  esac
+
+  if [ -z "$LG_ARCH" ]; then
+    warn "unrecognised arch $(uname -m) — skipping lazygit"
+  else
+    info "installing lazygit $LAZYGIT_VERSION ($LG_OS/$LG_ARCH)"
+    LG_TMP="$(mktemp -d)"
+    LG_URL="https://github.com/jesseduffield/lazygit/releases/download/v${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION}_${LG_OS}_${LG_ARCH}.tar.gz"
+
+    # Guarded with `if` so a network hiccup warns instead of killing the whole
+    # script under `set -e`.
+    if curl -fsSL "$LG_URL" -o "$LG_TMP/lazygit.tar.gz"; then
+      tar -xzf "$LG_TMP/lazygit.tar.gz" -C "$LG_TMP" lazygit
+      mkdir -p "$(dirname "$LAZYGIT_BIN")"
+      # Plain `install -m`: GNU's -D flag does not exist on BSD/macOS install.
+      install -m 755 "$LG_TMP/lazygit" "$LAZYGIT_BIN"
+      ok "lazygit $LAZYGIT_VERSION → $LAZYGIT_BIN"
+    else
+      warn "lazygit download failed — skipping ($LG_URL)"
+    fi
+    rm -rf "$LG_TMP"
+  fi
+fi
+
+# The binary is useless if its directory isn't reachable.
+case ":$PATH:" in
+  *":$HOME/.local/bin:"*) ;;
+  *) warn "$HOME/.local/bin is not on \$PATH — lazygit won't be found" ;;
+esac
+
 # ── powerlevel10k ─────────────────────────────────────────────────────────────
 P10K_DIR="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
 if [ ! -d "$P10K_DIR" ]; then
@@ -105,6 +165,20 @@ if [ -f "$ZSHRC" ]; then
   sed_inplace 's|ZSH_THEME=".*"|ZSH_THEME="powerlevel10k/powerlevel10k"|' "$ZSHRC"
   sed_inplace 's/plugins=(git)/plugins=()/' "$ZSHRC"
   ok "patched .zshrc"
+
+  # lazygit alias. Guarded by a marker so re-running never duplicates the block.
+  if grep -q "# >>> dotfiles: lazygit" "$ZSHRC"; then
+    ok "lg alias already present"
+  else
+    info "adding lg alias to .zshrc"
+    cat >>"$ZSHRC" <<'EOF'
+
+# >>> dotfiles: lazygit
+alias lg='lazygit'
+# <<< dotfiles: lazygit
+EOF
+    ok "added alias lg='lazygit'"
+  fi
 else
   warn ".zshrc not found — skipping zsh patches"
 fi

@@ -34,6 +34,15 @@ return {
           capabilities = capabilities,
         })
       end,
+      ["clangd"] = function()
+        -- clangd defaults to utf-8, but Neovim (and other clients) default to utf-16.
+        -- Pin clangd to utf-16 to avoid "multiple different client offset_encodings" warnings.
+        local clangd_capabilities = vim.tbl_deep_extend("force", {}, capabilities)
+        clangd_capabilities.offsetEncoding = { "utf-16" }
+        lspconfig["clangd"].setup({
+          capabilities = clangd_capabilities,
+        })
+      end,
       ["lua_ls"] = function()
         -- configure lua server (with special settings)
         lspconfig["lua_ls"].setup({

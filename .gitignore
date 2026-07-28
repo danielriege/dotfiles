@@ -2,3 +2,11 @@ vim/bundle/*
 .DS_Store
 /old
 config/tmux/plugins
+
+# lazygit treats its config dir as read-write scratch space — per the upstream
+# docs it "contains the config file in addition to some other files lazygit
+# uses to keep track of state across sessions" (recent repos, update checks,
+# popup flags). Since that dir is symlinked into this repo, allowlist the
+# config and ignore the rest, so a future state file can't sneak into commits.
+config/lazygit/*
+!config/lazygit/config.yml

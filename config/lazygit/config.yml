@@ -1,0 +1,75 @@
+# lazygit config — managed by dotfiles, symlinked to ~/.config/lazygit
+#
+# Schema validated against lazygit v0.63.1 (the version pinned in install.sh).
+# To see every available key and its current default:  lazygit --config
+#
+# Dracula palette:
+#   background   #282a36      current-line  #44475a      foreground  #f8f8f2
+#   comment      #6272a4      cyan          #8be9fd      green       #50fa7b
+#   orange       #ffb86c      pink          #ff79c6      purple      #bd93f9
+#   red          #ff5555      yellow        #f1fa8c
+
+gui:
+  # ── Dracula theme ───────────────────────────────────────────────────────────
+  theme:
+    activeBorderColor:
+      - "#ff79c6" # pink — border of the focused panel
+      - bold
+    inactiveBorderColor:
+      - "#bd93f9" # purple — borders of everything else
+    searchingActiveBorderColor:
+      - "#8be9fd" # cyan — focused panel while a search is active
+      - bold
+    optionsTextColor:
+      - "#6272a4" # comment — the keybinding hint line at the bottom
+    selectedLineBgColor:
+      - "#44475a" # current-line — cursor row in the focused panel
+    # inactiveViewSelectedLineBgColor is deliberately NOT overridden. Upstream
+    # ships `bold` (a text style, not a colour) because lazygit inherits the
+    # terminal background rather than painting its own. Setting it to Dracula's
+    # #282a36 makes the cursor row in unfocused panels invisible on any
+    # Dracula-themed terminal.
+    cherryPickedCommitFgColor:
+      - "#6272a4" # comment
+    cherryPickedCommitBgColor:
+      - "#8be9fd" # cyan — commits copied for cherry-pick
+    markedBaseCommitFgColor:
+      - "#6272a4" # comment
+    markedBaseCommitBgColor:
+      - "#f1fa8c" # yellow — rebase base marker
+    unstagedChangesColor:
+      - "#ff5555" # red
+    defaultFgColor:
+      - "#f8f8f2" # foreground
+
+  # ── Icons ───────────────────────────────────────────────────────────────────
+  # Requires a Nerd Font in the terminal. "Liga SFMono Nerd Font" is installed
+  # on this machine; if icons render as tofu boxes, set this back to "".
+  nerdFontsVersion: "3"
+
+  # ── Behaviour ───────────────────────────────────────────────────────────────
+  # The next three currently MATCH lazygit's defaults. They're pinned here on
+  # purpose so an upstream default flip can't silently change our setup.
+  showFileTree: true # tree view of changed files, not a flat list
+  splitDiff: auto # side-by-side diff when the pane is wide enough
+  commitLength:
+    show: true # warn when the commit subject runs long
+
+  showRandomTip: false # the rotating tip line stops being useful on day two
+
+git:
+  autoFetch: true # background fetch so remote branches stay current
+  log:
+    showGraph: always
+    order: topo-order
+
+  # No pager configured on purpose: delta / diff-so-fancy aren't installed on
+  # this machine, and lazygit's built-in diff renderer is fine. If you ever add
+  # delta, note the v0.63.1 key is `git.pagers` (a LIST) — the older
+  # `git.paging` map that most blog posts show was removed.
+
+update:
+  # install.sh pins an exact lazygit version. Letting lazygit self-update would
+  # overwrite that binary behind the dotfiles' back, so the two would drift.
+  # Bump the version in install.sh instead.
+  method: never

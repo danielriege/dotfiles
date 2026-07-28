@@ -1,5 +1,6 @@
 return {
   "nvim-treesitter/nvim-treesitter",
+  branch = "master", -- classic branch: keeps configs.setup API; `main` is the 0.11+ rewrite with a different API
   build = ":TSUpdate",
   config = function()
     local configs = require("nvim-treesitter.configs")
