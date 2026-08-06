@@ -62,11 +62,22 @@ git:
   log:
     showGraph: always
     order: topo-order
-
-  # No pager configured on purpose: delta / diff-so-fancy aren't installed on
-  # this machine, and lazygit's built-in diff renderer is fine. If you ever add
-  # delta, note the v0.63.1 key is `git.pagers` (a LIST) — the older
-  # `git.paging` map that most blog posts show was removed.
+  # ── Diff pager ──────────────────────────────────────────────────────────────
+  # delta. install.sh pins v0.19.2 into ~/.local/bin next to the lazygit binary;
+  # if it's missing, lazygit does NOT fall back to its builtin renderer — the
+  # diff pane just says "delta not found". Bump the version in install.sh.
+  #
+  # Schema: in v0.63.1 the key is `git.pagers`, a LIST (cycle entries at runtime
+  # with `|`). The `git.paging` map that most blog posts show was removed. Add
+  # `- {}` as a second entry to make the builtin renderer one `|` press away.
+  #
+  # `colorArg` is omitted on purpose — it defaults to "always", which is what
+  # delta wants. The flag set is upstream's own from docs/Custom_Pagers.md:
+  # --hyperlinks turns the left-margin line numbers into clickable links and
+  # lazygit understands the lazygit-edit:// scheme. delta's --navigate does not
+  # work inside lazygit, so don't bother adding it.
+  pagers:
+    - pager: delta --dark --paging=never --line-numbers --hyperlinks --hyperlinks-file-link-format="lazygit-edit://{path}:{line}"
 
 update:
   # install.sh pins an exact lazygit version. Letting lazygit self-update would

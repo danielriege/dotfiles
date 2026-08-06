@@ -144,10 +144,63 @@ else
   fi
 fi
 
-# The binary is useless if its directory isn't reachable.
+# ── delta ─────────────────────────────────────────────────────────────────────
+# Diff pager used by lazygit (see git.pagers in config/lazygit/config.yml).
+# Same pinned-tarball approach as lazygit above, and for the same reason: apt's
+# git-delta needs root, and on Ubuntu 24.04 it's 0.16.5 — three minor versions
+# behind.
+#
+# Two things differ from the lazygit block:
+#   1. delta's git tags carry NO leading "v" (0.19.2, not v0.19.2).
+#   2. its tarball nests everything under delta-<ver>-<triple>/, so the extract
+#      needs --strip-components=1 (bsdtar and GNU tar both support it).
+DELTA_VERSION="0.19.2"
+DELTA_BIN="$HOME/.local/bin/delta"
+
+if [ -x "$DELTA_BIN" ] && "$DELTA_BIN" --version 2>/dev/null | grep -q "delta $DELTA_VERSION"; then
+  ok "delta $DELTA_VERSION already installed"
+else
+  # Assets are named delta-<ver>-<rust-target-triple>.tar.gz. The triple can't
+  # be composed from OS+arch the way lazygit's can: upstream ships no
+  # x86_64-apple-darwin build at all, and arm64 Linux is gnu-only (no musl).
+  # So map the whole thing explicitly and let unlisted combos fall through.
+  case "$OS/$(uname -m)" in
+    linux/x86_64 | linux/amd64)   DELTA_TRIPLE="x86_64-unknown-linux-musl" ;;
+    linux/arm64 | linux/aarch64)  DELTA_TRIPLE="aarch64-unknown-linux-gnu" ;;
+    mac/arm64 | mac/aarch64)      DELTA_TRIPLE="aarch64-apple-darwin" ;;
+    *)                            DELTA_TRIPLE="" ;;
+  esac
+
+  if [ -z "$DELTA_TRIPLE" ]; then
+    # Intel Macs land here. Not fatal to this script, but it does leave lazygit
+    # broken: it will NOT fall back to its builtin renderer — the diff pane just
+    # reports "delta not found". Either build delta from source or comment out
+    # git.pagers in config/lazygit/config.yml on such a machine.
+    warn "no prebuilt delta for $OS/$(uname -m) — skipping (lazygit's diff pane will error until git.pagers is removed)"
+  else
+    info "installing delta $DELTA_VERSION ($DELTA_TRIPLE)"
+    DT_TMP="$(mktemp -d)"
+    DT_DIR="delta-${DELTA_VERSION}-${DELTA_TRIPLE}"
+    DT_URL="https://github.com/dandavison/delta/releases/download/${DELTA_VERSION}/${DT_DIR}.tar.gz"
+
+    # Guarded with `if` so a network hiccup warns instead of killing the whole
+    # script under `set -e`.
+    if curl -fsSL "$DT_URL" -o "$DT_TMP/delta.tar.gz"; then
+      tar -xzf "$DT_TMP/delta.tar.gz" -C "$DT_TMP" --strip-components=1 "$DT_DIR/delta"
+      mkdir -p "$(dirname "$DELTA_BIN")"
+      install -m 755 "$DT_TMP/delta" "$DELTA_BIN"
+      ok "delta $DELTA_VERSION → $DELTA_BIN"
+    else
+      warn "delta download failed — skipping ($DT_URL)"
+    fi
+    rm -rf "$DT_TMP"
+  fi
+fi
+
+# Those binaries are useless if their directory isn't reachable.
 case ":$PATH:" in
   *":$HOME/.local/bin:"*) ;;
-  *) warn "$HOME/.local/bin is not on \$PATH — lazygit won't be found" ;;
+  *) warn "$HOME/.local/bin is not on \$PATH — lazygit and delta won't be found" ;;
 esac
 
 # ── powerlevel10k ─────────────────────────────────────────────────────────────
