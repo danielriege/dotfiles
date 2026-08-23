@@ -62,11 +62,31 @@ mkdir -p "$HOME/.config"
 make_link "$DOTFILES_DIR/config/nvim" "$HOME/.config/nvim"
 make_link "$DOTFILES_DIR/config/tmux" "$HOME/.config/tmux"
 make_link "$DOTFILES_DIR/config/lazygit" "$HOME/.config/lazygit"
+make_link "$DOTFILES_DIR/config/ghostty" "$HOME/.config/ghostty"
 
 # On macOS lazygit does NOT read ~/.config unless XDG_CONFIG_HOME is set — it
 # looks in ~/Library/Application Support/lazygit. Link both so either works.
 if [ "$OS" = "mac" ]; then
   make_link "$DOTFILES_DIR/config/lazygit" "$HOME/Library/Application Support/lazygit"
+fi
+
+# ── SF Mono (macOS) ───────────────────────────────────────────────────────────
+# Apple ships SF Mono only inside Terminal.app's bundle, where it is NOT a
+# registered font — apps like Ghostty can't see it and quietly fall back to
+# something else. Copying it into ~/Library/Fonts registers it. `cp -n` so a
+# newer hand-installed copy is never clobbered.
+if [ "$OS" = "mac" ]; then
+  SFMONO_SRC="/System/Applications/Utilities/Terminal.app/Contents/Resources/Fonts"
+  if [ -f "$HOME/Library/Fonts/SF-Mono-Regular.otf" ]; then
+    ok "SF Mono already installed"
+  elif compgen -G "$SFMONO_SRC/SF-Mono-*.otf" >/dev/null; then
+    info "installing SF Mono from Terminal.app"
+    mkdir -p "$HOME/Library/Fonts"
+    cp -n "$SFMONO_SRC"/SF-Mono-*.otf "$HOME/Library/Fonts/"
+    ok "SF Mono → ~/Library/Fonts"
+  else
+    warn "SF Mono not found in Terminal.app — Ghostty will fall back to JetBrains Mono"
+  fi
 fi
 
 # ── TPM ───────────────────────────────────────────────────────────────────────

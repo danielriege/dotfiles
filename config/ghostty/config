@@ -1,0 +1,62 @@
+# ── Ghostty ───────────────────────────────────────────────────────────────────
+# Symlinked to ~/.config/ghostty by install.sh.
+# Reload without restarting: cmd+shift+, — full option list: `ghostty +show-config
+# --default --docs`, themes: `ghostty +list-themes`.
+
+# ── Font ──────────────────────────────────────────────────────────────────────
+# Apple's real SF Mono, with the Nerd-Font-patched build as a fallback purely
+# for glyphs SF Mono doesn't have (powerlevel10k / dracula-tmux icons). Order
+# matters: every normal character is rendered by Apple's own face, so this looks
+# exactly like Terminal.app/Xcode rather than like a patched lookalike.
+#
+# SF Mono is NOT installed on macOS by default — Apple ships it unregistered
+# inside Terminal.app's bundle, where Ghostty can't see it. install.sh copies it
+# into ~/Library/Fonts; without that step this silently falls back to Ghostty's
+# builtin JetBrains Mono.
+font-family = "SF Mono"
+font-family = "Liga SFMono Nerd Font"
+font-size = 13
+
+# ── Theme ─────────────────────────────────────────────────────────────────────
+# Built into Ghostty — nothing to install. "Dracula+" is the higher-contrast
+# variant if this one feels muted.
+theme = Dracula
+
+# ── Background ────────────────────────────────────────────────────────────────
+# The official Dracula wallpaper (moon + bats, MIT, vendored in wallpapers/),
+# dropped to ~10% so it reads as a faint texture behind the text rather than
+# something you actually look at. Raise background-image-opacity for more.
+#
+# Note background-image-opacity is *relative* to background-opacity, so the
+# window is left fully opaque here — stacking the wallpaper on top of a
+# see-through blurred desktop just muddies both. To go back to the old
+# translucent look instead, set background-opacity = 0.9 and background-blur =
+# 20 and comment out the image.
+background-image = wallpapers/dracula-moon.png
+background-image-opacity = 0.10
+background-image-fit = cover
+background-image-position = center
+background-opacity = 1
+
+# ── Window ────────────────────────────────────────────────────────────────────
+window-padding-x = 10
+window-padding-y = 8
+window-padding-balance = true
+macos-titlebar-style = tabs
+window-save-state = always
+
+# ── Cursor / input ────────────────────────────────────────────────────────────
+cursor-style = block
+cursor-style-blink = false
+mouse-hide-while-typing = true
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+# Dracula-tinted build of the official icon: purple ghost (#BD93F9) over a
+# screen that fades from the Dracula background (#282A36) up to its current-line
+# grey (#44475A). Swap the frame to `plastic` for glossy dark instead of brushed
+# metal. Ghostty marks custom-style experimental — if a future release changes
+# the layer format, fall back to `macos-icon = holographic`.
+macos-icon = custom-style
+macos-icon-frame = aluminum
+macos-icon-ghost-color = #BD93F9
+macos-icon-screen-color = #282A36,#44475A
