@@ -79,6 +79,20 @@ git:
   pagers:
     - pager: delta --dark --paging=never --line-numbers --hyperlinks --hyperlinks-file-link-format="lazygit-edit://{path}:{line}"
 
+os:
+  # ── Editor ──────────────────────────────────────────────────────────────────
+  # Without this, lazygit walks core.editor → $GIT_EDITOR → $VISUAL → $EDITOR
+  # and lands on plain `vi`, because none of those are set on this machine
+  # (the EDITOR export in ~/.zshrc is still commented out). Naming the preset
+  # here keeps the choice inside the dotfiles instead of depending on the
+  # environment lazygit happens to inherit.
+  #
+  # The preset expands to the right invocations for `e` (edit), `o` (open) and
+  # the at-this-line variants, i.e. `nvim +{{line}} -- {{filename}}`. That's
+  # also what makes delta's lazygit-edit:// hyperlinks (see git.pagers above)
+  # land on the correct line.
+  editPreset: nvim
+
 update:
   # install.sh pins an exact lazygit version. Letting lazygit self-update would
   # overwrite that binary behind the dotfiles' back, so the two would drift.
