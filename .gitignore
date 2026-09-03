@@ -10,3 +10,7 @@ config/tmux/plugins
 # config and ignore the rest, so a future state file can't sneak into commits.
 config/lazygit/*
 !config/lazygit/config.yml
+config/ghostty/*
+!config/ghostty/config
+!config/ghostty/dracula-headerbar.css
+!config/ghostty/wallpaper-castle.png
