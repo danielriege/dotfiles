@@ -1,62 +1,278 @@
-# ── Ghostty ───────────────────────────────────────────────────────────────────
-# Symlinked to ~/.config/ghostty by install.sh.
-# Reload without restarting: cmd+shift+, — full option list: `ghostty +show-config
-# --default --docs`, themes: `ghostty +list-themes`.
-
-# ── Font ──────────────────────────────────────────────────────────────────────
-# Apple's real SF Mono, with the Nerd-Font-patched build as a fallback purely
-# for glyphs SF Mono doesn't have (powerlevel10k / dracula-tmux icons). Order
-# matters: every normal character is rendered by Apple's own face, so this looks
-# exactly like Terminal.app/Xcode rather than like a patched lookalike.
+# ═══════════════════════════════════════════════════════════════════════════
+#  Ghostty — Daniel Riege            dotfiles/config/ghostty/config
+#  Symlinked to ~/.config/ghostty by install.sh (plus the macOS
+#  Application Support path — see the ghostty block in install.sh).
 #
-# SF Mono is NOT installed on macOS by default — Apple ships it unregistered
-# inside Terminal.app's bundle, where Ghostty can't see it. install.sh copies it
-# into ~/Library/Fonts; without that step this silently falls back to Ghostty's
-# builtin JetBrains Mono.
-font-family = "SF Mono"
-font-family = "Liga SFMono Nerd Font"
-font-size = 13
+#  CROSS-PLATFORM: this single file serves both Linux and macOS. Verified that
+#  Ghostty carries every gtk-* and macos-* key in its schema on ALL platforms,
+#  so the irrelevant ones parse fine and are simply ignored — no split files or
+#  platform includes needed. `ghostty +validate-config` on Linux accepts the
+#  macos-* block below with exit 0.
+#
+#  WHY THIS FILE IS NAMED `config` AND NOT `config.ghostty`
+#  Ghostty >= 1.2.3 also reads `config.ghostty`, and the docs claim plain
+#  `config` wins when both exist. On 1.3.1 that is BACKWARDS — tested twice in
+#  an isolated XDG_CONFIG_HOME, `config.ghostty` won. Rather than depend on
+#  which way round it is, ship exactly ONE file, and use the name every Ghostty
+#  version has always read: `config`. If you ever add a `config.ghostty` next
+#  to this, expect one of them to be silently shadowed.
+#
+#  GOTCHA: NO trailing inline comments. Ghostty takes everything after the "="
+#  as the value, "#" included, so  font-size = 10  # small  is a parse error.
+#  Every comment here therefore sits on its own line.
+#
+#  PATHS: relative paths are resolved against THIS file's directory (verified
+#  for config-file, background-image and gtk-custom-css). That is what keeps
+#  this portable — no /home/riegedan or /Users/... hardcoded anywhere.
+#
+#  Reload live, no restart :  ctrl+shift+,
+#  Check for typos         :  ghostty +validate-config
+#  See what is really live :  ghostty +show-config
+# ═══════════════════════════════════════════════════════════════════════════
 
-# ── Theme ─────────────────────────────────────────────────────────────────────
-# Built into Ghostty — nothing to install. "Dracula+" is the higher-contrast
-# variant if this one feels muted.
+# ── Font: Apple SF Mono ────────────────────────────────────────────────────
+# "Liga" = ligatures, "Nerd Font" = the glyph patch the Dracula tmux status
+# line and powerline separators need in order to not render as tofu boxes.
+#
+# Repeating font-family builds a FALLBACK CHAIN (verified: the startup log
+# registers every listed family for each style). This matters for a dotfiles
+# repo — a fresh machine may not have the Nerd Font yet, and without a fallback
+# Ghostty silently drops to whatever the OS considers monospace. The macOS
+# entries are Apple's own SF Mono and Menlo, both present out of the box.
+# install.sh warns if the Nerd Font is missing and prints where to get it —
+# and on macOS also copies SF Mono itself out of Terminal.app's bundle into
+# ~/Library/Fonts, since Apple ships it there unregistered.
+font-family = Liga SFMono Nerd Font
+font-family = SFMono Nerd Font
+font-family = SF Mono
+font-family = Menlo
+font-family = DejaVu Sans Mono
+
+# Ghostty's default is 12. Nudge live with ctrl+plus / ctrl+minus, then write
+# whatever you settle on here — live zoom is per-window and is not persisted.
+# A larger size for a specific machine (e.g. a MacBook screen) belongs in
+# local.conf below, not here — this value is the shared cross-machine default.
+font-size = 10.5
+
+# SF Mono is a light typeface and thins out at 10.5 over a wallpaper. If it
+# looks washed out, uncomment this for the Medium cut (same family, +1 weight).
+# font-style = Medium
+#
+# NOTE: font-thicken is deliberately absent — it is macOS-only, and even there
+# it only helps at larger sizes.
+
+# ── Theme ──────────────────────────────────────────────────────────────────
 theme = Dracula
 
-# ── Background ────────────────────────────────────────────────────────────────
-# The official Dracula wallpaper (moon + bats, MIT, vendored in wallpapers/),
-# dropped to ~10% so it reads as a faint texture behind the text rather than
-# something you actually look at. Raise background-image-opacity for more.
+# Darker base surface than stock Dracula (#282a36, 17% luminance) — 7% here.
 #
-# Note background-image-opacity is *relative* to background-opacity, so the
-# window is left fully opaque here — stacking the wallpaper on top of a
-# see-through blurred desktop just muddies both. To go back to the old
-# translucent look instead, set background-opacity = 0.9 and background-blur =
-# 20 and comment out the image.
-background-image = wallpapers/dracula-moon.png
-background-image-opacity = 0.10
-background-image-fit = cover
-background-image-position = center
+# WHY THIS AND NOT JUST A LOWER background-image-opacity: the shaded composite
+# is  image * X + background * (1 - X),  so as X falls it converges on
+# `background` and can never go darker than the background colour itself.
+# Dropping X from 0.08 to 0.02 moved the mean only 19% -> 17% while erasing the
+# art. The background colour is the actual floor, so it is the real dark knob.
+#
+#     background   bg lum   note
+#      #282a36       17%    stock Dracula
+#      #21222c       14%    Dracula darker variant
+#      #1c1d26       12%
+#      #16171e        9%    one step back from current
+#      #101116        7%    <- current
+#      #0b0c0f        5%    next step darker, still a hint of blue
+#      #000000        0%    pure black (loses Dracula warmth entirely)
+#
+# MUST stay below the `theme` line — later settings win, so putting this above
+# `theme = Dracula` would let the theme's own background overwrite it.
+# Only the base surface changes; every other Dracula colour is untouched.
+background = #101116
+
+# Dracula's comment / dim colour (palette 8) lifted from #6272a4 to #8b9dc9.
+#
+# WHY: #6272a4 is the structural weak link in this theme. As WCAG contrast
+# against what sits behind it:
+#       on pure black, the absolute best case ... 4.46:1
+#       on a flat #101116, no wallpaper at all .. 4.01:1
+#       over the wallpaper at opacity 0.45 ...... 2.32:1
+# WCAG AA for body text is 4.5:1, so stock #6272a4 cannot pass even on black.
+# Anything drawn in it — prompt path segments, git hints, dimmed ls output,
+# secondary CLI text — is the stuff that reads as "hard to see". The white
+# foreground was never the problem; it sits at a comfortable 16:1.
+#
+# #8b9dc9 keeps the same muted blue-grey character but clears 6.27:1 at the
+# current settings. Steps: #828fc0 (subtler) < #8b9dc9 (current) < #93a4d0.
+# Revert to stock with:  palette = 8=#6272a4
+palette = 8=#8b9dc9
+
+# Paint the GTK titlebar from the terminal palette instead of bright Adwaita
+# grey. This single line does most of the "top bar stops shouting" work.
+window-theme = ghostty
+
+# ── Background: fully OPAQUE + native image shading ───────────────────────
+# No transparency. The desktop never shows through. 1.0, not 0.93.
 background-opacity = 1
 
-# ── Window ────────────────────────────────────────────────────────────────────
-window-padding-x = 10
-window-padding-y = 8
-window-padding-balance = true
-macos-titlebar-style = tabs
-window-save-state = always
+# Relative path — resolved against this file's directory, so it works on both
+# machines with no absolute path. Pristine, byte-for-byte as downloaded.
+background-image = wallpaper-castle.png
 
-# ── Cursor / input ────────────────────────────────────────────────────────────
+# THIS is the dark-overlay knob — Ghostty's equivalent of the background image
+# "shade" slider in xfce4-terminal (or urxvt's tinting), and it behaves the
+# same way: composites the image at partial alpha over the background colour,
+# so it both DARKENS and FLATTENS. At 0.12 only an eighth of the image's
+# contrast range survives; the rest is pulled toward #101116. Because
+# background-opacity is 1, that partner colour is fully opaque — a real scrim,
+# not transparency to the desktop.
+#
+# NOTE: this value is MULTIPLIED by background-opacity. At background-opacity
+# 0.5 an image-opacity of 1.5 yields a real 0.75. Ours is 1, so this is literal.
+#
+# CHOOSE THIS BY CONTRAST, NOT BY BRIGHTNESS. A background can measure a
+# perfectly dark average and still ruin text, because what matters is the WCAG
+# contrast ratio between each text colour and the BRIGHTEST text-sized patch
+# behind it. Measured on wallpaper-castle.png over #101116:
+#
+#     value   white #f8f8f2   dim #6272a4   dim #8b9dc9 (ours)
+#      0.45       10.2:1         2.32:1        4.03:1
+#      0.30       12.8:1         2.90:1        5.05:1
+#      0.20       14.6:1         3.30:1        5.75:1
+#      0.15       15.4:1         3.48:1        6.06:1
+#      0.12       15.9:1         3.60:1        6.27:1   <- current
+#      0.10       16.3:1         3.70:1        6.43:1
+#      0.06       16.9:1         3.84:1        6.68:1
+#      0.00       17.7:1         4.01:1        6.97:1   (no image)
+#
+# WCAG AA = 4.5:1. Note the middle column never reaches it at ANY opacity —
+# that is the palette problem fixed above, not something this knob can solve.
+#
+# If you swap the image, RE-MEASURE. The right value is a property of the
+# picture, not a portable setting: bright photographic art whose highlights
+# land where the prompt renders needs roughly 0.08-0.15, while this castle art
+# (already dark, local peak 45%) is happy at 0.12-0.30.
+background-image-opacity = 0.12
+
+# "cover" fills the window. Default "contain" would letterbox the image.
+background-image-fit = cover
+background-image-position = center
+background-image-repeat = false
+
+# Side effect worth knowing: alpha shading blends toward the background colour,
+# so it desaturates as it darkens. Barely matters here — the castle art is
+# already Dracula-purple and close in hue to #101116.
+
+# ── Cursor / input: shared ─────────────────────────────────────────────────
 cursor-style = block
 cursor-style-blink = false
 mouse-hide-while-typing = true
 
-# ── macOS ─────────────────────────────────────────────────────────────────────
+# Restore tabs/splits/working dirs on relaunch.
+window-save-state = always
+
+# ── Scrolling: one wheel notch = one small step ────────────────────────────
+# Ghostty's default is discrete:3 — three rows per notch.
+#   discrete:*  = classic notched mouse wheel
+#   precision:* = high-resolution / touchpad scrolling (trackpads)
+# IMPORTANT: inside tmux, TMUX owns the scroll step, not Ghostty. That half is
+# fixed in dotfiles/config/tmux/tmux.conf, which rebinds the wheel from tmux's
+# built-in 5 rows per notch down to 1. Changing only this line here would leave
+# scrolling unchanged for any work done inside a tmux session.
+mouse-scroll-multiplier = precision:0.4,discrete:1
+
+# ── tmux + terminfo correctness ────────────────────────────────────────────
+# TERM stays xterm-ghostty so no terminal capabilities are thrown away. Two
+# things must be true for that to work with tmux, and install.sh handles both:
+#   1. the xterm-ghostty terminfo entry must exist. It ships WITH Ghostty (in
+#      the snap on Linux, inside Ghostty.app on macOS) but is often not in the
+#      system terminfo db — without it tmux aborts with
+#      "missing or unsuitable terminal: xterm-ghostty".
+#   2. tmux.conf needs  terminal-features ",xterm-ghostty:RGB".  Note it must
+#      be terminal-features, NOT terminal-overrides: on tmux 3.4 an override of
+#      ...:RGB never shows up in #{client_termfeatures} and truecolor silently
+#      degrades. Verified side by side.
+term = xterm-ghostty
+
+# Forward terminfo and a sane TERM over ssh. Ghostty ships this OFF by default
+# (no-ssh-env,no-ssh-terminfo), which is exactly why ssh'ing into a host that
+# has never heard of xterm-ghostty breaks vim colours and arrow keys.
+shell-integration = detect
+shell-integration-features = cursor,no-sudo,title,path,ssh-env,ssh-terminfo
+
+# ── Minimal, compact window chrome: shared ─────────────────────────────────
+# No tab strip at all while there is only one tab.
+window-show-tab-bar = auto
+
+# Drop the second line of titlebar text.
+window-subtitle = false
+
+window-padding-x = 4
+window-padding-y = 2
+
+# Split leftover pixels evenly so you do not get one fat gutter on one side.
+window-padding-balance = true
+
+# Kill the "172x40" popup that flashes on every window resize.
+resize-overlay = never
+
+# Optional: skip the "close without saving?" prompt on a single pane. Left off
+# on purpose — it is the only thing standing between you and a lost session.
+# confirm-close-surface = false
+
+# ── Minimal, compact window chrome: LINUX / GTK ────────────────────────────
+# Ignored on macOS (the keys still parse there, they just do nothing).
+
+# Merge the tab strip INTO the titlebar: one slim bar instead of a titlebar
+# plus a separate tab row underneath it.
+gtk-titlebar-style = tabs
+
+# No shadow seam between the bar and the terminal area.
+gtk-toolbar-style = flat
+
+# Tabs shrink to fit their label instead of stretching across the window.
+gtk-wide-tabs = false
+
+# gtk-titlebar-hide-when-maximized = true
+
+# Relative path, resolved against this file's directory.
+#
+# Ghostty's own headerbar CSS uses oklab(from ...) for the *backdrop* colour,
+# which needs GTK >= 4.16. On GTK 4.14 that one declaration fails to parse
+# ("css parsing failed at <data>:6:20-26") and the UNFOCUSED titlebar reverts
+# to grey Adwaita. The file restates those colours literally and removes the
+# seam under the bar. Harmless on newer GTK and on macOS; drop it once every
+# machine you use is on GTK 4.16+.
+gtk-custom-css = dracula-headerbar.css
+
+# Nuclear option — no titlebar whatsoever. On GNOME/Wayland you then move the
+# window with Super+drag and resize with Super+middle-drag. Uncomment if the
+# "tabs" titlebar is still more bar than you want:
+# window-decoration = none
+
+# ── Minimal, compact window chrome: macOS ──────────────────────────────────
+# Ignored on Linux. These are the closest equivalents to the GTK block above.
+#
+# "tabs" merges the tab bar into the titlebar, the same idea as
+# gtk-titlebar-style = tabs. Alternatives: "transparent", "native", "hidden"
+# ("hidden" removes the bar entirely and is the macOS analogue of
+# window-decoration = none, but you also lose the traffic-light buttons).
+macos-titlebar-style = tabs
+
+# Make left Option behave as Alt so readline/tmux/nvim Alt- bindings work.
+# Without this, macOS swallows Option for accented characters.
+macos-option-as-alt = left
+
 # Dracula-tinted build of the official icon: purple ghost (#BD93F9) over a
 # screen that fades from the Dracula background (#282A36) up to its current-line
 # grey (#44475A). Swap the frame to `plastic` for glossy dark instead of brushed
 # metal. Ghostty marks custom-style experimental — if a future release changes
-# the layer format, fall back to `macos-icon = holographic`.
+# the layer format, fall back to `macos-icon = holographic`. Ignored on Linux.
 macos-icon = custom-style
 macos-icon-frame = aluminum
 macos-icon-ghost-color = #BD93F9
 macos-icon-screen-color = #282A36,#44475A
+
+# ── Machine-local overrides ────────────────────────────────────────────────
+# Optional include — the "?" prefix means "load if present, stay silent if
+# not" (verified: a missing ?file validates with exit 0, while a missing
+# mandatory config-file reports error.FileNotFound). Put anything
+# machine-specific here (a different wallpaper, a different font size for an
+# external monitor) without dirtying the repo. Git-ignored; see .gitignore.
+config-file = ?local.conf

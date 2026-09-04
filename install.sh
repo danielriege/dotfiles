@@ -68,6 +68,13 @@ make_link "$DOTFILES_DIR/config/ghostty" "$HOME/.config/ghostty"
 # looks in ~/Library/Application Support/lazygit. Link both so either works.
 if [ "$OS" = "mac" ]; then
   make_link "$DOTFILES_DIR/config/lazygit" "$HOME/Library/Application Support/lazygit"
+
+  # Ghostty DOES read ~/.config/ghostty on macOS, so the link above is already
+  # enough. This second link exists because macOS loads the Application Support
+  # copy AFTER the XDG one, meaning a stale file left there would silently win
+  # over the repo config. Pointing both at the same directory makes that
+  # impossible instead of merely unlikely.
+  make_link "$DOTFILES_DIR/config/ghostty" "$HOME/Library/Application Support/com.mitchellh.ghostty"
 fi
 
 # ── SF Mono (macOS) ───────────────────────────────────────────────────────────
@@ -115,6 +122,88 @@ if [ -f "$PLAYERCTL_SCRIPT" ] && [ -f "$PLAYERCTL_PATCH" ]; then
   patch -N -p1 "$PLAYERCTL_SCRIPT" < "$PLAYERCTL_PATCH" \
     && ok "playerctl patched" \
     || warn "playerctl patch skipped (already applied or conflict)"
+fi
+
+# ── Ghostty terminfo ──────────────────────────────────────────────────────────
+# config/ghostty/config sets `term = xterm-ghostty` so no terminal capabilities
+# are thrown away. The catch: that terminfo entry ships WITH Ghostty but is
+# usually absent from the system terminfo database, and without it tmux refuses
+# to start at all — "missing or unsuitable terminal: xterm-ghostty".
+#
+# Goes into ~/.terminfo, so no sudo. Note the METHOD: pipe infocmp through tic
+# rather than copying the compiled file. ncurses names its subdirectories
+# differently per platform — letters on Linux (x/xterm-ghostty), hex on macOS
+# (78/xterm-ghostty) — and letting tic do the compiling means the local
+# convention is used automatically instead of us hardcoding a guess.
+if infocmp xterm-ghostty >/dev/null 2>&1; then
+  ok "xterm-ghostty terminfo already available"
+else
+  GHOSTTY_TI=""
+  for d in \
+    /snap/ghostty/current/share/terminfo \
+    /usr/share/terminfo \
+    /usr/local/share/terminfo \
+    /var/lib/flatpak/app/com.mitchellh.ghostty/current/active/files/share/terminfo \
+    "$HOME/.local/share/terminfo" \
+    /Applications/Ghostty.app/Contents/Resources/terminfo \
+    "$HOME/Applications/Ghostty.app/Contents/Resources/terminfo"
+  do
+    if [ -d "$d" ] && infocmp -A "$d" xterm-ghostty >/dev/null 2>&1; then
+      GHOSTTY_TI="$d"
+      break
+    fi
+  done
+
+  if [ -z "$GHOSTTY_TI" ]; then
+    warn "xterm-ghostty terminfo not found — tmux will refuse to start in Ghostty"
+    warn "  install Ghostty first, then re-run this script"
+  else
+    info "installing xterm-ghostty terminfo from $GHOSTTY_TI"
+    # tic emits a harmless note about the description field on older ncurses;
+    # both streams are silenced so it cannot trip `set -e` or look like a fault.
+    if infocmp -A "$GHOSTTY_TI" -x xterm-ghostty 2>/dev/null \
+         | tic -x -o "$HOME/.terminfo" - 2>/dev/null; then
+      ok "xterm-ghostty terminfo → ~/.terminfo"
+    else
+      warn "tic failed to compile the xterm-ghostty terminfo entry"
+    fi
+  fi
+fi
+
+# ── Ghostty font ──────────────────────────────────────────────────────────────
+# config/ghostty/config asks for "Liga SFMono Nerd Font": ligaturised SF Mono
+# with the Nerd Font glyph patch, which is what stops the Dracula tmux status
+# line and powerline separators rendering as tofu boxes.
+#
+# NOT vendored into this repo, deliberately. The 12 OTFs come to ~50 MB, and
+# SF Mono is Apple-licensed — redistributing it from a public GitHub remote is
+# not ours to do. The config lists SF Mono, Menlo and DejaVu Sans Mono as
+# fallbacks so a machine without it still gets a sane monospace, just without
+# the Nerd Font glyphs. Hence a warning here rather than an install step.
+case "$OS" in
+  mac)   FONT_DIR="$HOME/Library/Fonts" ;;
+  linux) FONT_DIR="$HOME/.local/share/fonts" ;;
+esac
+
+ghostty_font_present() {
+  case "$OS" in
+    linux)
+      command -v fc-list >/dev/null 2>&1 \
+        && fc-list 2>/dev/null | grep -qi "SFMono Nerd Font"
+      ;;
+    mac)
+      ls "$HOME/Library/Fonts" /Library/Fonts 2>/dev/null | grep -qi "SFMono"
+      ;;
+  esac
+}
+
+if ghostty_font_present; then
+  ok "SFMono Nerd Font present"
+else
+  warn "Liga SFMono Nerd Font not installed"
+  warn "  Ghostty falls back to SF Mono / Menlo / DejaVu Sans Mono, but Nerd Font"
+  warn "  glyphs (tmux status line, powerline separators) will show as boxes."
+  warn "  Drop the LigaSFMonoNerdFont-*.otf files into $FONT_DIR and re-run."
 fi
 
 # ── lazygit ───────────────────────────────────────────────────────────────────

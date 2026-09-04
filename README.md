@@ -27,12 +27,19 @@ lazygit   version pinned as LAZYGIT_VERSION in install.sh, fetched from the
           ~/.config/lazygit (plus ~/Library/Application Support/lazygit on mac).
           Aliased to `lg` in .zshrc.
 
-Ghostty (macOS): config/ghostty/config, symlinked to ~/.config/ghostty.
-          Dracula theme (built into Ghostty, nothing to install), Apple's SF Mono
-          with Liga SFMono Nerd Font as a glyph-only fallback, and the official
-          Dracula wallpaper (config/ghostty/wallpapers, MIT, from
-          github.com/dracula/wallpaper) as a ~10% background image.
-          install.sh copies SF Mono out of Terminal.app into ~/Library/Fonts —
-          macOS keeps it unregistered there, so without that step Ghostty
-          silently falls back to JetBrains Mono.
-          Reload config with cmd+shift+, (the app icon needs a full restart).
+ghostty   Config: config/ghostty/config — Dracula, SF Mono, castle wallpaper
+          behind a dark scrim. Symlinked to ~/.config/ghostty (plus
+          ~/Library/Application Support/com.mitchellh.ghostty on mac). One file
+          serves both OSes: Ghostty keeps every gtk-* and macos-* key in its
+          schema on all platforms, so the irrelevant half just parses and is
+          ignored. Asset paths inside it are RELATIVE, resolved against the
+          config's own directory, so nothing is hardcoded to one $HOME.
+          install.sh additionally installs the xterm-ghostty terminfo entry
+          into ~/.terminfo (without it tmux refuses to start under Ghostty),
+          and on macOS copies SF Mono out of Terminal.app into
+          ~/Library/Fonts, where it is otherwise unregistered.
+          The Nerd Font patch (Liga SFMono Nerd Font) is NOT vendored: ~50 MB
+          and Apple-licensed. install.sh warns if it is missing; the config
+          falls back to SF Mono / Menlo / DejaVu Sans Mono.
+          Machine-specific tweaks (e.g. a larger font-size on macOS) go in
+          config/ghostty/local.conf (git-ignored).
