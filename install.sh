@@ -341,6 +341,22 @@ alias lg='lazygit'
 EOF
     ok "added alias lg='lazygit'"
   fi
+
+  if grep -q "# >>> dotfiles: scripts" "$ZSHRC"; then
+    ok "script aliases already present"
+  else
+    info "adding script aliases to .zshrc"
+    {
+      printf '\n# >>> dotfiles: scripts\n'
+      printf 'DOTFILES_SCRIPTS_DIR=%q\n' "$DOTFILES_DIR/scripts"
+      cat <<'EOF'
+alias setup='"$DOTFILES_SCRIPTS_DIR/tmux_setup.sh"'
+alias ozzy='"$DOTFILES_SCRIPTS_DIR/ozzy-claude.sh"'
+# <<< dotfiles: scripts
+EOF
+    } >>"$ZSHRC"
+    ok "added setup and ozzy aliases"
+  fi
 else
   warn ".zshrc not found — skipping zsh patches"
 fi
